@@ -1,0 +1,14 @@
+{
+  "name": "pageview",
+  "version": "0.0.1",
+  "description": "",
+  "main": "pageview.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redis": "^3.0.2"
+  }
+}

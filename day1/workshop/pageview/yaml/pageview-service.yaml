@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: pageview-service
+  name: pageview
 spec:
   type: NodePort
   selector:
