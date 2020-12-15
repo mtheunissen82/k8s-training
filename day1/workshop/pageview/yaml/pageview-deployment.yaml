@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pageview-deployment
+  labels:
+    app: pageview-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pageview
+  template:
+    metadata:
+      labels:
+        app: pageview
+    spec:
+      containers:
+      - name: pageview
+        image: mtheunissen82/pageview:latest
+        ports:
+        - containerPort: 8080
