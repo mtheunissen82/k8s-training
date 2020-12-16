@@ -6,7 +6,7 @@ COPY pageview.js .
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci
+RUN npm ci && npm cache clean -f
 
 USER node
 

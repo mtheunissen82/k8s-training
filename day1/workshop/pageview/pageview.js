@@ -27,3 +27,15 @@ const server = http.createServer((req, res) => {
 server.listen(appPort, () => {
   console.log(`Server started (port: ${appPort})`);
 });
+
+function signalHandler(signal) {
+  console.log(`Received signal: '${signal}'`);
+
+  server.close(() => console.log('Server closed'));
+  client.quit(() => console.log('Redis closed'));
+
+  setTimeout(() => process.exit(0), 5000);
+}
+
+process.on('SIGINT', signalHandler);
+process.on('SIGTERM', signalHandler);
