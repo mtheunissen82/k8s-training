@@ -2,10 +2,9 @@ const os = require('os');
 const http = require('http');
 const redis = require('redis');
 
-const port = 8080;
-
-const redisHost = 'redis';
-const redisPort = 6379;
+const appPort = process.env.APP_PORT;
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const client = redis.createClient({host:redisHost, port: redisPort});
 
@@ -25,6 +24,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`Server started (port: ${port})`);
+server.listen(appPort, () => {
+  console.log(`Server started (port: ${appPort})`);
 });

@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:slim
 
 WORKDIR /app
 
@@ -6,7 +6,9 @@ COPY pageview.js .
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install
+RUN npm ci
+
+USER node
 
 EXPOSE 8080
 
