@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: activity-pod
+  labels:
+    name: activity-pod
+spec:
+  restartPolicy: Always
+  containers:
+  - name: activity-pod
+    image: mtheunissen82/activity-pod:latest
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+    - containerPort: 80
+    readinessProbe:
+      exec:
+        command:
+          - cat
+          - /tmp/healthy
+      initialDelaySeconds: 20
+      periodSeconds: 10
