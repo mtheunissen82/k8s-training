@@ -9,7 +9,7 @@ const redisPort = process.env.REDIS_PORT;
 const client = redis.createClient({host:redisHost, port: redisPort});
 
 client.on('error', function(error) {
-    console.error(error);
+  console.error(error);
 });
 
 client.setnx('counter', 0);
@@ -34,6 +34,7 @@ function signalHandler(signal) {
   server.close(() => console.log('Server closed'));
   client.quit(() => console.log('Redis closed'));
 
+  // Give the http and redis server some time to shutdown gracefully
   setTimeout(() => process.exit(0), 5000);
 }
 
