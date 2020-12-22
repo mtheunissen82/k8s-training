@@ -45,6 +45,8 @@ spec:
     volumeMounts:
     - mountPath: /usr/share/nginx/html
       name: tmp-volume
+    ports:
+    - containerPort: 80
   initContainers:
   - name: busybox
     image: busybox
