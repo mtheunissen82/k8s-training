@@ -2,7 +2,7 @@
 
 source common.sh
 
-excercise1() {
+exercise1() {
   echo "### 1. Create a Pod with two containers, both with image busybox and command \"echo hello; sleep 3600\". Connect to the second container and run 'ls'"
 
   kubectl apply -f - <<YAML
@@ -30,7 +30,7 @@ YAML
   kubectl delete pod busybox-duo --now
 }
 
-excercise2() {
+exercise2() {
   echo "### Create pod with nginx container exposed at port 80. Add a busybox init container which downloads a page using \"wget -O /work-dir/index.html http://neverssl.com/online\". Make a volume of type emptyDir and mount it in both containers. For the nginx container, mount it on \"/usr/share/nginx/html\" and for the initcontainer, mount it on \"/work-dir\". When done, get the IP of the created pod and create a busybox pod and run \"wget -O- IP\""
 
   kubectl apply -f - <<YAML
@@ -68,7 +68,7 @@ YAML
   kubectl run tmpbox --image=busybox -i --rm --restart=Never -- $wgetCommand
 }
 
-# excercise1
-excercise2
+# exercise1
+exercise2
 
 # vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:
