@@ -100,34 +100,57 @@ exercise11() {
 
 exercise12() {
   echo "### Create a deployment with image nginx:1.7.8, called nginx, having 2 replicas, defining port 80 as the port that this container exposes (don't create a service for this deployment)"
+
+  kubectl create deployment nginx --image=nginx:1.7.8 --replicas=2 --port=80
 }
 
 exercise13() {
   echo "### View the YAML of this deployment"
+
+  kubectl get deployment nginx -o yaml
 }
 
 exercise14() {
   echo "### View the YAML of the replica set that was created by this deployment"
+
+  kubectl get replicasets -lapp=nginx -o yaml
 }
 
 exercise15() {
   echo "### Get the YAML for one of the pods"
+
+  local pod_name=""
+  # grab last pod in list
+  pod_name="$(kubectl get pods -lapp=nginx | tail -n1 | awk '{print $1}')"
+
+  kubectl get pods "$pod_name" -o yaml
 }
 
 exercise16() {
   echo "### Check how the deployment rollout is going"
+  
+  kubectl rollout status deployment nginx
 }
 
 exercise17() {
   echo "### Update the nginx image to nginx:1.7.9"
+
+  kubectl set image deployment nginx nginx=nginx:1.7.9
 }
   
 exercise18() {
   echo "### Check the rollout history and confirm that the replicas are OK"
+
+  echo "print rollout history"
+  kubectl rollout history deployment nginx
+  echo "check rollout status"
+  kubectl rollout status deployment nginx
 }
 
 exercise19() {
   echo "### Undo the latest rollout and verify that new pods have the old image (nginx:1.7.8)"
+
+  kubectl rollout undo deployment nginx
 }
 
 exercise20() {
@@ -220,14 +243,28 @@ exerciseX() {
 
 # vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:
 
-exercise1
-exercise2
-exercise3
-exercise4
-exercise5
-exercise6
-exercise7
-exercise8
-exercise9
-exercise10
-exercise11
+# exercise1
+# exercise2
+# exercise3
+# exercise4
+# exercise5
+# exercise6
+# exercise7
+# exercise8
+# exercise9
+# exercise10
+# exercise11
+exercise12
+exercise13
+exercise14
+exercise15
+exercise16
+exercise17
+exercise18
+#  exercise19
+#  exercise20
+#  exercise21
+#  exercise22
+#  exercise23
+#  exercise24
+#  exercise25
