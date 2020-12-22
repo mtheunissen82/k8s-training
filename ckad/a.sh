@@ -199,11 +199,23 @@ exercise18() {
   kubectl delete pod nginx
 }
 
-# exercise1
-# exercise2
-# exercise3
+exercise1
+exercise2
+exercise3
 exercise4
 exercise5
+exercise6
+exercise7
+exercise8
+exercise9
+exercise10
+exercise11
+exercise12
+exercise13
+exercise14
+exercise15
+exercise16
+exercise17
 exercise18
 
 # vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:
