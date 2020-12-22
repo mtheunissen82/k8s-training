@@ -1,27 +1,6 @@
 #!/bin/bash
 
-wait_for_pending_pod() {
-  local pod_name=$1
-  local phase="Pending"
-  local attempt=0
-  local max_attempts=10
-
-  while [[ $phase == "Pending" && $attempt -le $max_attempts ]]; do
-    ((attempt=attempt+1))
-
-    phase="$(kubectl get pod "$1" --output=jsonpath='{.status.phase}')"
-    echo "Pod '$pod_name' phase 'Pending' (attempt #${attempt})"
-
-    sleep 1
-  done
-
-  if [[ $attempt -ge $max_attempts ]]; then
-    echo "Waiting for pod failed (Max. attempts '$max_attempts' reached)" 1>&2
-    return 1
-  fi
-
-  echo "Pod '$pod_name' phase '$phase'"
-}
+source common.sh
 
 exercise1() {
   echo "### 1. Create a namespace called 'mynamespace' and a pod with image nginx called nginx on this namespace"
@@ -136,7 +115,7 @@ exercise10() {
 
   # then fetch the podIP and construct wget command
   local nginxPodIp wgetCommand
-  nginxPodIp="$(kubectl get pod nginx -o jsonpath='{.status.podIP}')"
+  nginxPodIp="$(get_pod_ip nginx)"
   wgetCommand="/bin/wget -q -O - http://${nginxPodIp}/"
 
   # perform wget command in busybox pod
