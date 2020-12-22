@@ -45,13 +45,13 @@ spec:
     volumeMounts:
     - mountPath: /usr/share/nginx/html
       name: tmp-volume
-  # initContainers:
-  # - name: busybox
-  #   image: busybox
-  #   volumeMounts:
-  #   - mountPath: /work-dir
-  #     name: tmp-volume
-  #   command: ['/bin/sh', '/bin/wget -q -O /work-dir/index.html http://neverssl.com/online']
+  initContainers:
+  - name: busybox
+    image: busybox
+    volumeMounts:
+    - mountPath: /work-dir
+      name: tmp-volume
+    command: ['/bin/sh', '-c', '/bin/wget -q -O /work-dir/index.html http://neverssl.com/online']
   volumes:
   - name: tmp-volume
     emptyDir: {}
@@ -63,12 +63,14 @@ YAML
   local nginxPodIp wgetCommand
   nginxPodIp="$(get_pod_ip nginx)"
   wgetCommand="/bin/wget -q -O - http://${nginxPodIp}/"
-  echo "wget command to perform: $wgetCommand"
+  echo "Pod IP is: '${nginxPodIp}'"
+  echo "wget command to perform: ${wgetCommand}"
 
   kubectl run tmpbox --image=busybox -i --rm --restart=Never -- $wgetCommand
+  kubectl delete pod nginx --now
 }
 
-# exercise1
+exercise1
 exercise2
 
 # vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:

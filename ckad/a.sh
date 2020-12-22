@@ -9,6 +9,7 @@ exercise1() {
   kubectl run nginx --image=nginx --namespace=mynamespace
 
   echo "### Cleanup"
+  kubectl delete pod nginx
   kubectl delete namespace mynamespace --now
 }
 
