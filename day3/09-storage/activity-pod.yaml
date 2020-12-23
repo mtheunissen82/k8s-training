@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: activity-pod
+spec:
+  containers:
+    - image: ubuntu
+      name: read-container
+      volumeMounts:
+        - name: alc
+          mountPath: /data/application
+      command: ['/bin/bash', '-ec', 'sleep 30; cat /data/application/data.txt; sleep 3600']
+    - image: ubuntu
+      name: write-container
+      volumeMounts:
+        - name: alc
+          mountPath: /data/application
+      command: ['/bin/bash', '-ec', 'echo "Data written by the write-container" > /data/application/data.txt; sleep 3600']
+  volumes:
+    - name: alc
+      persistentVolumeClaim:
+        claimName: activity-local-claim
