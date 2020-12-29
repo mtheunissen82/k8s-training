@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: killmein30s
+spec:
+  backoffLimit: 5
+  # activeDeadlineSeconds: 30
+  template:
+    spec:
+      containers:
+      - name: killmein30s
+        image: busybox
+        command: ['/bin/sh', '-c', 'echo "start"; sleep 5; echo "end"; exit 1;']
+      restartPolicy: Never

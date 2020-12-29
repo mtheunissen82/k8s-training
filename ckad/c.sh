@@ -143,6 +143,7 @@ exercise18() {
 
   echo "print rollout history"
   kubectl rollout history deployment nginx
+
   echo "check rollout status"
   kubectl rollout status deployment nginx
 }
@@ -155,93 +156,189 @@ exercise19() {
 
 exercise20() {
   echo "### Do an on purpose update of the deployment with a wrong image nginx:1.91"
+
+  kubectl set image deployment nginx nginx=nginx:1.91
 }
 
 exercise21() {
   echo "### Verify that something's wrong with the rollout"
+
+  echo "watch the status of the rollout for 10s (hint: it is never going to complete)"
+  kubectl rollout status deployment nginx --timeout=10s
+
+  echo "check deployment"
+  kubectl get deployment nginx -o wide
+
+  echo "check pods (should display an error: ImagePullBackOff"
+  kubectl get pods -o wide
 }
 
 exercise22() {
   echo "### Return the deployment to the second revision (number 2) and verify the image is nginx:1.7.9"
+
+  echo "perform rollback to revision 2"
+  kubectl rollout undo --to-revision=2 deployment nginx
+
+  echo "verify rollout status"
+  kubectl rollout status deployment nginx
+  
+  echo "print current image version used by deployment"
+  kubectl get deployment nginx -o=jsonpath='{.spec.template.spec.containers[*].image}'
+
+  # print newline
+  echo
 }
 
 exercise23() {
   echo "### Check the details of the fourth revision (number 4)"
+
+  echo "compact overview of revision 4"
+  kubectl rollout history deployment nginx --revision=4
+
+  echo "details (YAML) of revision 4"
+  kubectl rollout history deployment nginx --revision=4 -o yaml
 }
 
 exercise24() {
   echo "### Scale the deployment to 5 replicas"
+
+  kubectl scale deployment nginx --replicas=5
 }
 
-exerciseX() {
-  echo "### Autoscale the deployment, pods between 5 and 10, targetting CPU utilization at 80%"
+exercise25() {
+  echo "### 25. Autoscale the deployment, pods between 5 and 10, targetting CPU utilization at 80%"
+
+  kubectl autoscale deployment nginx --min=5 --max=10 --cpu-percent=80
 }
 
-exerciseX() {
-  echo "### Pause the rollout of the deployment"
+exercise26() {
+  echo "### 26. Pause the rollout of the deployment"
+
+  kubectl rollout pause deployment nginx
 }
 
-exerciseX() {
-  echo "### Update the image to nginx:1.9.1 and check that there's nothing going on, since we paused the rollout"
+exercise27() {
+  echo "### 27. Update the image to nginx:1.9.1 and check that there's nothing going on, since we paused the rollout"
+
+  echo "set image to 1.9.1"
+  kubectl set image deployment nginx nginx=nginx:1.9.1
+
+  echo "verify rollout status (for max 5s if in progress)"
+  timeout 5 kubectl rollout status deployment nginx
+
+  echo "observe pods for 5s to make sure nothing is happening"
+  timeout 5 kubectl get pods --watch
 }
 
-exerciseX() {
-  echo "### Resume the rollout and check that the nginx:1.9.1 image has been applied"
+exercise28() {
+  echo "### 28. Resume the rollout and check that the nginx:1.9.1 image has been applied"
+
+  echo "resume rollout"
+  kubectl rollout resume deployment nginx
+
+  echo "check rollout status (for max 30s)"
+  timeout 30 kubectl rollout status deployment nginx
 }
 
-exerciseX() {
-  echo "### Delete the deployment and the horizontal pod autoscaler you created"
+exercise29() {
+  echo "### 29. Delete the deployment and the horizontal pod autoscaler you created"
+
+  echo "delete deployment"
+  kubectl delete deployment nginx
+
+  echo "delete autoscaler"
+  kubectl delete horizontalpodautoscalers.autoscaling nginx
 }
 
-exerciseX() {
-  echo "### Create a job named pi with image perl that runs the command with arguments \"perl -Mbignum=bpi -wle 'print bpi(2000)'\""
+exercise30() {
+  echo "### 30. Create a job named pi with image perl that runs the command with arguments \"perl -Mbignum=bpi -wle 'print bpi(2000)'\""
+
+  kubectl create job pi --image=perl -- perl -Mbignum=bpi -wle 'print bpi(2000)'
 }
 
-exerciseX() {
-  echo "### Wait till it's done, get the output"
+exercise31() {
+  echo "### 31. Wait till it's done, get the output"
+
+  echo "wait max 40s till job is complete"
+  kubectl wait job pi --for=condition=complete --timeout=40s
+
+  echo "print output from the job"
+  kubectl logs -ljob-name=pi
+
+  echo "delete job"
+  kubectl delete job pi --now
 }
 
-exerciseX() {
-  echo "### Create a job with the image busybox that executes the command 'echo hello;sleep 30;echo world'"
+exercise32() {
+  echo "### 32. Create a job with the image busybox that executes the command 'echo hello;sleep 30;echo world'"
+
+  kubectl create job helloworld --image=busybox -- /bin/sh -c 'echo hello;sleep 30;echo world'
 }
 
-exerciseX() {
-  echo "### Follow the logs for the pod (you'll wait for 30 seconds)"
+exercise33() {
+  echo "### 33. Follow the logs for the pod (you'll wait for 30 seconds)"
+
+  echo "print output from the job (max 30s)"
+  timeout 30 kubectl logs -ljob-name=helloworld --tail
 }
 
-exerciseX() {
-  echo "### See the status of the job, describe it and see the logs"
+exercise34() {
+  echo "### 34. See the status of the job, describe it and see the logs"
+
+  echo "print helloworld job data"
+  kubectl get job helloworld -o wide
+
+  echo "describe job helloworld"
+  kubectl describe job helloworld
 }
 
-exerciseX() {
-  echo "### Delete the job"
+exercise35() {
+  echo "### 35. Delete the job"
+
+  kubectl delete job helloworld --now
 }
 
-exerciseX() {
-  echo "### Create a job but ensure that it will be automatically terminated by kubernetes if it takes more than 30 seconds to execute"
+exercise36() {
+  echo "### 36. Create a job but ensure that it will be automatically terminated by kubernetes if it takes more than 30 seconds to execute"
+
+  echo "apply job manifest"
+  kubectl apply -f ./c/exercise36.yaml
+
+  echo "watch the pod for 40 seconds (it should stop after 30s)"
+  timeout 40 kubectl get pod -ljob-name=killmein30s --watch
+
+  echo "show some job details"
+  kubectl get job killmein30s -o wide
+
+  echo "show some job pod details"
+  kubectl get pod -ljob-name=killmein30s -o wide
+
+  echo "cleanup job"
+  kubectl delete job killmein30s --now
 }
 
-exerciseX() {
-  echo "### Create the same job, make it run 5 times, one after the other. Verify its status and delete it"
+exercise37() {
+  echo "### 37. Create the same job, make it run 5 times, one after the other. Verify its status and delete it"
+
+  echo "apply job manifest"
+  kubectl apply -f ./c/exercise37.yaml
 }
 
-exerciseX() {
-  echo "### Create the same job, but make it run 5 parallel times"
+exercise38() {
+  echo "### 38. Create the same job, but make it run 5 parallel times"
 }
 
-exerciseX() {
-  echo "### Create a cron job with image busybox that runs on a schedule of \"*/1 * * * *\" and writes 'date; echo Hello from the Kubernetes cluster' to standard output"
+exercise39() {
+  echo "### 39. Create a cron job with image busybox that runs on a schedule of \"*/1 * * * *\" and writes 'date; echo Hello from the Kubernetes cluster' to standard output"
 }
 
-exerciseX() {
-  echo "### See its logs and delete it"
+exercise40() {
+  echo "### 40. See its logs and delete it"
 }
 
-exerciseX() {
-  echo "### Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its schedule."
+exercise41() {
+  echo "### 41. Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its schedule."
 }
-
-# vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:
 
 # exercise1
 # exercise2
@@ -254,17 +351,35 @@ exerciseX() {
 # exercise9
 # exercise10
 # exercise11
-exercise12
-exercise13
-exercise14
-exercise15
-exercise16
-exercise17
-exercise18
-#  exercise19
-#  exercise20
-#  exercise21
-#  exercise22
-#  exercise23
-#  exercise24
-#  exercise25
+# exercise12
+# exercise13
+# exercise14
+# exercise15
+# exercise16
+# exercise17
+# exercise18
+# exercise19
+# exercise20
+# exercise21
+# exercise22
+# exercise23
+# exercise24
+# exercise25
+# exercise26
+# exercise27
+# exercise28
+# exercise29
+# exercise30
+# exercise31
+# exercise32
+# exercise33
+# exercise34
+# exercise35
+# exercise36
+exercise37
+# exercise38
+# exercise39
+# exercise40
+# exercise41
+
+# vim: set expandtab tabstop=2 softtabstop=2 shiftwidth=2:
