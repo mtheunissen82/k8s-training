@@ -326,18 +326,118 @@ exercise37() {
 
 exercise38() {
   echo "### 38. Create the same job, but make it run 5 parallel times"
+
+  kubectl apply -f - <<YAML
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fiveparallel
+spec:
+  completions: 5
+  parallelism: 5
+  template:
+    spec:
+      containers:
+      - name: fiveparallel
+        image: busybox
+        command: ['/bin/sh', '-c', 'echo "start"; sleep 5; echo "end"; exit 0;']
+      restartPolicy: Never
+YAML
+
+  echo "wacht the job pods for 10s"
+  timeout 10 kubectl get pods --watch
+
+  echo "delete the 'fiveparallel' job"
+  kubectl delete job fiveparallel --now
 }
 
 exercise39() {
   echo "### 39. Create a cron job with image busybox that runs on a schedule of \"*/1 * * * *\" and writes 'date; echo Hello from the Kubernetes cluster' to standard output"
+
+  echo "create cronjob"
+  # we can't create it with a oneline command since we need to add some job and pod labels
+  # kubectl create cronjob --image=busybox --schedule='*/1 * * * *' -- /bin/sh -c 'date; echo Hello from the kubernetes cluster'
+
+  kubectl apply -f - <<YAML
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hellocron
+spec:
+  jobTemplate:
+    metadata:
+      name: hellocron
+      labels:
+        myjob: hellocron
+    spec:
+      template:
+        metadata:
+          labels:
+            myjob-pod: hellocron
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the kubernetes cluster
+            image: busybox
+            name: hellocron
+            resources: {}
+          restartPolicy: OnFailure
+  schedule: '*/1 * * * *'
+YAML
+
+  echo "watch all resources for 70s"; sleep 3;
+  timeout 70 watch -n1 -d kubectl get all
 }
 
 exercise40() {
   echo "### 40. See its logs and delete it"
+
+  echo "check pod output"
+  kubectl logs -lmyjob-pod=hellocron
+
+  echo "delete the cronjob 'hellocron'"
+  kubectl delete cronjob hellocron --now
 }
 
 exercise41() {
   echo "### 41. Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its schedule."
+
+  kubectl apply -f - <<YAML
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hellocron
+spec:
+  jobTemplate:
+    metadata:
+      name: hellocron
+      labels:
+        myjob: hellocron
+    spec:
+      activeDeadlineSeconds: 17
+      template:
+        metadata:
+          labels:
+            myjob-pod: hellocron
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the kubernetes cluster
+            image: busybox
+            name: hellocron
+            resources: {}
+          restartPolicy: OnFailure
+  schedule: '*/1 * * * *'
+YAML
+
+  echo "Not realy interested in the output since it won't be killed anyway"
+  echo "So delete the cronjob"
+
+  kubectl delete cronjob hellocron --now
 }
 
 # exercise1
@@ -376,7 +476,7 @@ exercise41() {
 # exercise34
 # exercise35
 # exercise36
-exercise37
+# exercise37
 # exercise38
 # exercise39
 # exercise40
