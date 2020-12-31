@@ -4,10 +4,17 @@ source common.sh
 
 exercise1() {
   echo "### Create a configmap named config with values foo=lala,foo2=lolo"
+
+  kubectl create cm config --from-literal=foo=lala --from-literal=foo2=lolo
 }
 
 exercise2() {
   echo "### Display its values"
+
+  kubectl describe cm config
+
+  echo "### Cleanup"
+  kubectl delete cm config --now
 }
 
 exercise3() {
@@ -16,10 +23,16 @@ exercise3() {
   echo "create file 'config.txt'"
   echo -e "foo3=lili\nfoo4=lele" > config.txt
 
+  echo "create configmap from file"
+  kubectl create cm cmfromfile --from-file=config.txt
+
+  echo "describe the newly created configmap"
+  kubectl describe cm cmfromfile
+
   echo "### Cleanup"
   rm -f config.txt
+  kubectl delete cm cmfromfile --now
 }
-
 
 exercise4() {
   echo "### Create and display a configmap from a .env file"
@@ -27,8 +40,15 @@ exercise4() {
   echo "create file 'config.env'"
   echo -e "var1=val1\n# this is a comment\n\nvar2=val2\n#anothercomment" > config.env
 
+  echo "create the configmap from envfile"
+  kubectl create cm cmfromenvfile --from-env-file=config.env
+
+  echo "describe the newly created configmap"
+  kubectl describe cm cmfromenvfile
+
   echo "### Cleanup"
   rm -f config.env
+  kubectl delete cm cmfromenvfile --now
 }
 
 exercise5() {
@@ -103,10 +123,10 @@ exercise19() {
   echo "### Create an nginx pod that uses 'myuser' as a service account"
 }
 
-# exercise1
-# exercise2
-# exercise3
-# exercise4
+exercise1
+exercise2
+exercise3
+exercise4
 # exercise5
 # exercise6
 # exercise7
