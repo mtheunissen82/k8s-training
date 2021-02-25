@@ -57,12 +57,52 @@ exercise5() {
   echo "create file 'config4.txt"
   echo -e "var3=val3\nvar4=val4" > config4.txt
 
+  echo "create the configmap from envfile"
+  kubectl create cm cmfromfileex5 --from-file="special=config4.txt"
+
+  echo "describe the newly created configmap"
+  kubectl describe cm cmfromfileex5
+
   echo "### Cleanup"
   rm -f config4.txt
+  kubectl delete cm cmfromfileex5 --now
 }
 
 exercise6() {
   echo "### Create a configMap called 'options' with the value var5=val5. Create a new nginx pod that loads the value from variable 'var5' in an env variable called 'option'"
+
+  echo "create the configmap 'options'"
+  kubectl create cm options --from-literal="var5=val5"
+
+  echo "describe the newly created configmap"
+  kubectl describe cm options
+
+  kubectl apply -f - <<YAML
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    env:
+    - name: options
+      valueFrom:
+        configMapKeyRef:
+          name: options
+          key: var5
+  restartPolicy: Always
+YAML
+
+  wait_for_pending_pod nginx
+
+  echo "Sleep 5 sec to make sure the container is running and print environment"
+  sleep 5; kubectl exec nginx -- env | grep --color options
+
+  echo "### Cleanup"
+  kubectl delete pod nginx --now
+  kubectl delete cm options --now
 }
 
 exercise7() {
@@ -123,12 +163,12 @@ exercise19() {
   echo "### Create an nginx pod that uses 'myuser' as a service account"
 }
 
-exercise1
-exercise2
-exercise3
-exercise4
+# exercise1
+# exercise2
+# exercise3
+# exercise4
 # exercise5
-# exercise6
+exercise6
 # exercise7
 # exercise8
 # exercise9
